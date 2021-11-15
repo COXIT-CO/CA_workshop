@@ -1,15 +1,14 @@
-from miro_client.client import MiroApiClient
+from complete_version.external_systems.miro_interface import MiroApiClient
 
 AUTH_TOKEN = '7avPu0XGaswfMPGRTQ1ufVWtVrs'
-BOARD_ID = 'o9J_lj76qZM='
-
+BOARD_ID = 'o9J_ljuLrH8='
+DB_PATH = 'ids.json'
 
 if __name__ == "__main__":
-    client = MiroApiClient(base_url='https://api.miro.com',
-                           auth_token=AUTH_TOKEN)
-
     print("Welcome to the practical part of the workshop!")
     choice = -1
+    client = MiroApiClient(base_url='https://api.miro.com',
+                           auth_token=AUTH_TOKEN)
 
     while choice < 1 or choice > 5:
         if choice != -1:

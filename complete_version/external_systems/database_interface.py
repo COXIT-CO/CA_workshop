@@ -5,7 +5,7 @@ import json
 
 @dataclasses.dataclass
 class DatabaseClient:
-    def __init__(self, db_path='database/ids.json'):
+    def __init__(self, db_path='ids.json'):
         self.db_path = db_path
         with open(self.db_path) as db:
             self.ids = json.load(db)
