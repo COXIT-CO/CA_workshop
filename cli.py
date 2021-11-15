@@ -1,7 +1,7 @@
 from miro_client.client import MiroApiClient
 
-AUTH_TOKEN = '7avPu0XGaswfMPGRTQ1ufVWtVrs'
-BOARD_ID = 'o9J_lj76qZM='
+AUTH_TOKEN = ''
+BOARD_ID = 'o9J_ljuLrH8='
 
 
 if __name__ == "__main__":

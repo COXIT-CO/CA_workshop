@@ -1,4 +1,3 @@
-# DATABASE GATEWAY
 import dataclasses
 import json
 

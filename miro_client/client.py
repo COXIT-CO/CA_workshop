@@ -1,15 +1,12 @@
 from typing import List
-import re
 import requests
 import json
-
-from miro_client.miro_entities import Widget, create_widget_by_type
 from database.db_client import DatabaseClient
-from miro_client.exceptions import get_json_or_raise_exception, UnexpectedResponseException
+from miro_client.miro_data_processes import get_all_shapes_from_widgets, increment_voting_text
+from miro_client.miro_entities import Shape
 
 
 class MiroApiClient:
-    # Use cases
     def __init__(self, base_url: str, auth_token: str, db_path: str = 'database/ids.json'):
         self.base_url = base_url
         self.auth_token = auth_token
@@ -20,27 +17,21 @@ class MiroApiClient:
         }
         self.db_client = DatabaseClient(db_path)
 
-    def get_all_widgets_by_board_id(self, board_id: str) -> List[Widget]:
+    def get_all_shapes_by_board_id(self, board_id: str) -> List[Shape]:
         url = f'{self.base_url}/v1/boards/{board_id}/widgets/'
         response = requests.get(url, headers=self.auth_header_as_dict)
-        collection_json = get_json_or_raise_exception(response)
+        collection_json = response.json()
+        widgets_json = collection_json['data']
+        return get_all_shapes_from_widgets(widgets_json)
 
-        try:
-            widgets_json = collection_json['data']
-            return [create_widget_by_type(w) for w in widgets_json]
-        except Exception as e:
-            raise UnexpectedResponseException(cause=e)
-
-    def vote_for_code_with_number(self, id,  number) -> requests.Response:
-        widgets = self.get_all_widgets_by_board_id(board_id=id)
+    def vote_for_code_with_number(self, id, number) -> requests.Response:
+        widgets = self.get_all_shapes_by_board_id(board_id=id)
         update_shape_id = self.db_client.get_id_by_num(number)
         url = f'{self.base_url}/v1/boards/{id}/widgets/{update_shape_id}'
 
-        widget_to_update = next(item for item in widgets if item.obj_id == update_shape_id)
-        incremented_text = int(re.search(r'\d+', widget_to_update.text).group())+1
-
+        new_shape = increment_voting_text(widgets, update_shape_id)
         payload = {
-            "text": f"<p>Votes : {incremented_text}</p>"
+            "text": new_shape.text
         }
         resp = requests.patch(url, data=json.dumps(payload), headers=self.auth_header_as_dict)
         return resp
